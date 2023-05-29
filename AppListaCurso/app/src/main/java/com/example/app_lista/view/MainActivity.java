@@ -4,16 +4,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.app_lista.R;
+import com.example.app_lista.controller.PessoasController;
 import com.example.app_lista.model.Pessoa;
 
 public class MainActivity extends AppCompatActivity {
 
+    PessoasController controller;
     Pessoa pessoa;
     Pessoa outraPessoa;
 
@@ -35,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        controller = new PessoasController();
+        controller.toString();
+
         pessoa = new Pessoa();
         pessoa.setNome("Kaua");
         pessoa.setSobreNome("Matheus");
@@ -42,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         pessoa.setTelefone("34996933106");
 
         outraPessoa = new Pessoa();
-
 
         editNome = findViewById(R.id.text_PrimeiroNome);
         editSobrenome = findViewById(R.id.text_Sobrenome);
@@ -83,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
                 outraPessoa.setSobreNome(editSobrenome.getText().toString());
                 outraPessoa.setNomeCurso(editNomeCurso.getText().toString());
                 outraPessoa.setTelefone(editTelefone.getText().toString());
+
+                controller.salvar(outraPessoa);
 
                 Toast.makeText(MainActivity.this, "Dados salvos" + outraPessoa.toString(), Toast.LENGTH_LONG).show();
             }
