@@ -2,6 +2,7 @@ package com.example.app_lista.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
@@ -15,6 +16,10 @@ import com.example.app_lista.controller.PessoasController;
 import com.example.app_lista.model.Pessoa;
 
 public class MainActivity extends AppCompatActivity {
+
+    SharedPreferences preferences;
+
+    public static final String NOME_PREFERENCES = "pref_listavip";
 
     PessoasController controller;
     Pessoa pessoa;
@@ -37,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        preferences = getSharedPreferences(NOME_PREFERENCES, 0);
+        SharedPreferences.Editor listaVip = preferences.edit();
 
         controller = new PessoasController();
         controller.toString();
@@ -89,9 +97,16 @@ public class MainActivity extends AppCompatActivity {
                 outraPessoa.setNomeCurso(editNomeCurso.getText().toString());
                 outraPessoa.setTelefone(editTelefone.getText().toString());
 
+                Toast.makeText(MainActivity.this, "Dados salvos" + outraPessoa.toString(), Toast.LENGTH_LONG).show();
+
+                listaVip.putString("primeiroNome", outraPessoa.getNome());
+                listaVip.putString("sobrenome", outraPessoa.getSobreNome());
+                listaVip.putString("nomeCurso", outraPessoa.getNomeCurso());
+                listaVip.putString("telefoneContato", outraPessoa.getTelefone());
+                listaVip.apply();
+
                 controller.salvar(outraPessoa);
 
-                Toast.makeText(MainActivity.this, "Dados salvos" + outraPessoa.toString(), Toast.LENGTH_LONG).show();
             }
         });
 
