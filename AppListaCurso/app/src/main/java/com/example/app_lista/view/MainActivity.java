@@ -2,118 +2,107 @@ package com.example.app_lista.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.app_lista.R;
+import com.example.app_lista.controller.CursoController;
 import com.example.app_lista.controller.PessoasController;
 import com.example.app_lista.model.Pessoa;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
-    SharedPreferences preferences;
-
-    public static final String NOME_PREFERENCES = "pref_listavip";
-
     PessoasController controller;
+    CursoController cursoController;
     Pessoa pessoa;
     Pessoa outraPessoa;
 
-    String dadosPessoa;
-    String dadosOutaPessoa;
 
-    EditText editNome;
-    EditText editSobrenome;
-    EditText editNomeCurso;
-    EditText editTelefone;
+    List<String> nomesDoCursos;
+    EditText editPrimeiroNome;
+    EditText editSegundoNome;
+    EditText editCursoDesejado;
+    EditText editTelefoneContato;
 
-    Button btnbuton_Limpar;
-    Button btnbuton_Salvar;
-    Button btnbuton_Finalizar;
-
+    Button bpnLimpar;
+    Button bpnSalvar;
+    Button bpnFinalizar;
+    Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_spinner);
+        CursoController cursoController = new CursoController();
 
-        preferences = getSharedPreferences(NOME_PREFERENCES, 0);
-        SharedPreferences.Editor listaVip = preferences.edit();
+        cursoController = new CursoController();
+        nomesDoCursos = cursoController.dadosSpinner();
+        cursoController.getListaCursos();
 
-        controller = new PessoasController();
+        controller = new PessoasController(MainActivity.this);
         controller.toString();
 
-        pessoa = new Pessoa();
-        pessoa.setNome("Kaua");
-        pessoa.setSobreNome("Matheus");
-        pessoa.setNomeCurso("Tds");
-        pessoa.setTelefone("34996933106");
-
         outraPessoa = new Pessoa();
+        controller.buscar(outraPessoa);
 
-        editNome = findViewById(R.id.text_PrimeiroNome);
-        editSobrenome = findViewById(R.id.text_Sobrenome);
-        editNomeCurso = findViewById(R.id.text_NomeDoCurso);
-        editTelefone = findViewById(R.id.text_TelefoneDeContato);
+        editPrimeiroNome = findViewById(R.id.text_PrimeiroNome);
+        editSegundoNome = findViewById((R.id.text_Sobrenome));
+        editCursoDesejado = findViewById(R.id.text_NomeDoCurso);
+        editTelefoneContato = findViewById(R.id.text_TelefoneDeContato);
 
-        btnbuton_Limpar = findViewById(R.id.button_Limpar);
-        btnbuton_Salvar = findViewById(R.id.button_Salvar);
-        btnbuton_Finalizar = findViewById(R.id.button_Finalizar);
+        editPrimeiroNome.setText(outraPessoa.getNome());
+        editSegundoNome.setText(outraPessoa.getSobreNome());
+        editTelefoneContato.setText(outraPessoa.getTelefone());
+        editCursoDesejado.setText(outraPessoa.getNomeCurso());
 
-        editNome.setText(pessoa.getNome());
-        editSobrenome.setText(pessoa.getSobreNome());
-        editNomeCurso.setText(pessoa.getNomeCurso());
-        editTelefone.setText(pessoa.getTelefone());
+        bpnLimpar = findViewById(R.id.button_Limpar);
+        bpnFinalizar = findViewById(R.id.button_Finalizar);
+        bpnSalvar = findViewById(R.id.button_Salvar);
+        spinner = findViewById(R.id.spinner);
 
-        btnbuton_Limpar.setOnClickListener(new View.OnClickListener() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, cursoController.dadosSpinner());
+
+        adapter.setDropDownViewResource(android.R.layout.simple_list_item_1);
+        spinner.setAdapter(adapter);
+
+        bpnLimpar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editNome.setText("");
-                editSobrenome.setText("");
-                editNomeCurso.setText("");
-                editTelefone.setText("");
+                editPrimeiroNome.setText("");
+                editSegundoNome.setText("");
+                editCursoDesejado.setText("");
+                editTelefoneContato.setText("");
+                controller.limpar();
             }
         });
-
-        btnbuton_Finalizar.setOnClickListener(new View.OnClickListener() {
+        bpnFinalizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Finalizado", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Encerrando app...", Toast.LENGTH_LONG).show();
                 finish();
             }
         });
-
-        btnbuton_Salvar.setOnClickListener(new View.OnClickListener() {
+        bpnSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                outraPessoa.setNome(editNome.getText().toString());
-                outraPessoa.setSobreNome(editSobrenome.getText().toString());
-                outraPessoa.setNomeCurso(editNomeCurso.getText().toString());
-                outraPessoa.setTelefone(editTelefone.getText().toString());
-
-                Toast.makeText(MainActivity.this, "Dados salvos" + outraPessoa.toString(), Toast.LENGTH_LONG).show();
-
-                listaVip.putString("primeiroNome", outraPessoa.getNome());
-                listaVip.putString("sobrenome", outraPessoa.getSobreNome());
-                listaVip.putString("nomeCurso", outraPessoa.getNomeCurso());
-                listaVip.putString("telefoneContato", outraPessoa.getTelefone());
-                listaVip.apply();
-
+                outraPessoa.setNome(editPrimeiroNome.getText().toString());
+                outraPessoa.setSobreNome(editSegundoNome.getText().toString());
+                outraPessoa.setNomeCurso(editCursoDesejado.getText().toString());
+                outraPessoa.setTelefone(editTelefoneContato.getText().toString());
                 controller.salvar(outraPessoa);
-
             }
         });
-
-
-        Log.i("ProgramacaoPOO", pessoa.toString());
-        Log.i("ProgramacaoPOO", outraPessoa.toString());
-
-
+        spinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cursoController.getListaCursos()));
+        Log.i("POOAndroid", outraPessoa.toString());
     }
 }
